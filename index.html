@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Government websites… or not?</title>
+<meta name="description" content="A guessing game: is each of these archived websites run by a government, or not? Every site comes from the Internet Archive’s list of US and Canadian government websites, as the Wayback Machine saved it.">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script>
+try { const t = localStorage.getItem('gwon-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<style>
+/* Layout: one centered "case file" column; the web address is the hero, a rubber stamp is the reveal.
+   Branding follows Democracy's Library: its mint, black ink and Teko headings. */
+:root {
+  --bg: #e9edf2;          /* records-office blue-grey */
+  --paper: #fbfcfd;
+  --ink: #14233a;         /* federal navy ink */
+  --mint: #e3fed5;        /* Democracy's Library: the logo file's own mint */
+  --brand-ink: #000;
+  color-scheme: light;
+  --muted: #5b6b80;
+  --rule: #c9d2dd;
+  --gov: #1f7a4d;         /* approved green */
+  --not: #b3261e;         /* rejected red */
+  --hard: #b04a00;        /* pending orange, dark enough for 4.5:1 on paper and bg */
+  --accent: #2456a6;
+  --font-display: "Teko", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-stamp: "Saira Stencil One", "Impact", "Arial Black", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1724; --paper: #172234; --ink: #e6ecf4; --muted: #9aa8bb; --rule: #2c3a50;
+    --gov: #4cc38a; --not: #ff7a70; --hard: #ff9a4a; --accent: #8fb4ff; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1724; --paper: #172234; --ink: #e6ecf4; --muted: #9aa8bb; --rule: #2c3a50;
+  --gov: #4cc38a; --not: #ff7a70; --hard: #ff9a4a; --accent: #8fb4ff; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5; -webkit-text-size-adjust: 100%; }
+.brandbar { background: var(--mint); color: var(--brand-ink); border-bottom: 1px solid color-mix(in srgb, var(--brand-ink) 15%, transparent); padding-top: env(safe-area-inset-top); }
+.brandbar .in { max-width: 720px; margin: 0 auto; padding: 10px max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left)); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brandbar a.logo { display: block; color: inherit; border-radius: 3px; flex: 0 1 auto; min-width: 0; }
+.brandbar a.logo:focus-visible { outline-color: var(--brand-ink); }
+.brandbar img { display: block; height: auto; width: 272px; max-width: 100%; }
+.brandbar .logos { display: flex; align-items: center; gap: 14px; min-width: 0; }
+/* The Internet Archive logo is white on transparent, so it sits on its own ink-dark chip. */
+.brandbar a.ia { display: block; flex: none; background: #14233a; border-radius: 6px; padding: 6px; }
+.brandbar a.ia img { width: 40px; height: 40px; }
+.brandbar nav { display: flex; align-items: center; gap: 16px; }
+.brandbar nav a { color: var(--brand-ink); font-weight: 700; display: inline-block; padding-block: 10px; }
+@media (max-width: 959px) { .brandbar .tag { display: none; } }
+.lede { margin: 0; max-width: 65ch; font-size: 1.05rem; }
+.brandbar .tag { flex: 0 1 auto; min-width: 0; font-family: var(--font-display); font-weight: 500; font-size: 1.2rem; line-height: 1.05; text-transform: uppercase; text-align: right; max-width: 16ch; }
+.wrap { max-width: 720px; margin: 0 auto; padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right)); padding-block: 24px max(48px, env(safe-area-inset-bottom)); display: grid; gap: 20px; }
+main { display: grid; gap: 20px; }
+.title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(2.3rem, 7vw, 3.2rem); line-height: 0.95; text-transform: uppercase; margin: 0; text-wrap: balance; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.title-tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.theme { display: inline-flex; border: 1px solid var(--rule); border-radius: 5px; overflow: hidden; }
+.theme button { font: inherit; font-size: 0.85rem; font-weight: 600; min-height: 44px; min-width: 64px; padding: 8px 12px; background: var(--paper); color: var(--muted); border: 0; cursor: pointer; touch-action: manipulation; }
+.theme button + button { border-left: 1px solid var(--rule); }
+.theme button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.theme button:focus-visible { outline-offset: -3px; }
+.badge { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); border: 1px solid var(--rule); padding: 3px 8px; border-radius: 3px; }
+.file { background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; padding: clamp(18px, 4vw, 32px); position: relative; overflow: hidden; display: grid; gap: 18px; }
+.meta { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.meta b { color: var(--ink); font-weight: 600; }
+.meta h2 { font: inherit; margin: 0; }
+h2:focus, h3:focus { outline: none; }
+h2:focus-visible, h3:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.progress { display: flex; gap: 4px; }
+.progress i { width: 18px; height: 6px; border-radius: 2px; background: var(--rule); display: block; }
+.progress i.done-gov { background: var(--gov); } .progress i.done-not { background: var(--not); } .progress i.done-hard { background: var(--hard); }
+.progress i.miss { background: transparent; outline: 1.5px solid var(--muted); outline-offset: -1.5px; }
+.progress i.now { background: var(--accent); }
+.addr { font-family: var(--font-mono); font-weight: 600; font-size: clamp(1.25rem, 5.2vw, 2.1rem); line-height: 1.2; word-break: break-all; border-bottom: 2px solid var(--ink); padding-bottom: 12px; }
+.addr span { color: var(--muted); font-weight: 400; }
+.field { display: grid; gap: 4px; }
+.label { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.title-val { font-size: 1.15rem; font-weight: 600; }
+.ca { display: inline-block; margin-left: 8px; padding: 1px 6px; border: 1px solid var(--not); color: var(--not); border-radius: 3px; letter-spacing: 0.06em; }
+.clue-btn { justify-self: start; min-height: 44px; background: none; border: 1px dashed var(--muted); color: var(--muted); font: inherit; font-size: 0.9rem; padding: 8px 12px; border-radius: 4px; cursor: pointer; text-align: left; }
+@media (hover: hover) { .clue-btn:hover { color: var(--ink); border-color: var(--ink); } }
+.choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 520px) { .choices { grid-template-columns: 1fr; } }
+.choice { font: inherit; font-weight: 800; font-size: 1rem; min-height: 56px; padding: 14px 10px; touch-action: manipulation; border-radius: 5px; cursor: pointer; border: 2px solid currentColor; background: transparent; display: grid; gap: 2px; text-align: center; }
+.choice small { font-weight: 400; font-family: var(--font-mono); font-size: 0.7rem; }
+/* Key hints are noise on a touchscreen, and wrong once the player turns letter keys off. */
+.nokeys .choice small, .nokeys .keys-hint { display: none; }
+@media (hover: none) and (pointer: coarse) { .choice small, .keys-hint { display: none; } }
+.choice.gov { color: var(--gov); } .choice.not { color: var(--not); } .choice.hard { color: var(--hard); }
+@media (hover: hover) { .choice:hover:not(:disabled) { background: color-mix(in srgb, currentColor 10%, transparent); } }
+.choice:disabled { cursor: default; opacity: 0.35; }
+.choice.picked { opacity: 1; background: color-mix(in srgb, currentColor 14%, transparent); }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.stamp { position: absolute; top: 22px; right: 18px; font-family: var(--font-stamp); font-size: clamp(1.1rem, 4.4vw, 1.7rem); letter-spacing: 0.04em; padding: 4px 12px; border: 4px double currentColor; border-radius: 6px; transform: rotate(-9deg); opacity: 0.92; pointer-events: none; background: color-mix(in srgb, var(--paper) 70%, transparent); }
+.stamp.gov { color: var(--gov); } .stamp.not { color: var(--not); } .stamp.hard { color: var(--hard); }
+@media (prefers-reduced-motion: no-preference) {
+  .stamp.anim { animation: thunk 0.32s cubic-bezier(.2,1.6,.4,1) both; }
+  @keyframes thunk { from { transform: rotate(-9deg) scale(1.9); opacity: 0; } to { transform: rotate(-9deg) scale(1); opacity: 0.92; } }
+}
+.verdict { border-top: 1px solid var(--rule); padding-top: 16px; display: grid; gap: 10px; }
+.verdict h3 { margin: 0; font-size: 1.15rem; font-weight: 800; scroll-margin-top: 16px; }
+.verdict h3.right { color: var(--gov); } .verdict h3.wrong { color: var(--not); }
+.verdict p { margin: 0; max-width: 65ch; }
+.row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+.next { font: inherit; font-weight: 800; background: var(--ink); color: var(--paper); border: 0; border-radius: 5px; min-height: 48px; padding: 12px 22px; cursor: pointer; touch-action: manipulation; }
+@media (max-width: 520px) { .row .next { width: 100%; } }
+.verdict .row a { padding-block: 10px; }
+.opt { display: flex; gap: 10px; align-items: center; font-size: 0.9rem; color: var(--muted); min-height: 44px; }
+.opt input { width: 20px; height: 20px; margin: 0; accent-color: var(--ink); }
+a { color: var(--accent); }
+.intro p { margin: 0; max-width: 65ch; }
+.mix { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 520px) { .mix { grid-template-columns: 1fr; } }
+.mix div { border-left: 4px solid; padding: 4px 10px; }
+.mix .g { border-color: var(--gov); } .mix .n { border-color: var(--not); } .mix .h { border-color: var(--hard); }
+.mix div { font-size: 1.05rem; }
+.mix b { font-size: 1.35rem; display: block; line-height: 1.15; font-weight: 900; }
+.mix .g b { color: var(--gov); } .mix .n b { color: var(--not); } .mix .h b { color: var(--hard); }
+.score { font-family: var(--font-display); font-weight: 600; font-size: clamp(3.2rem, 11vw, 4.6rem); line-height: 0.9; font-variant-numeric: tabular-nums; }
+.recap { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.recap li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; border-bottom: 1px solid var(--rule); padding-bottom: 8px; }
+.recap .host { font-family: var(--font-mono); font-size: 0.9rem; word-break: break-all; }
+.recap .host a { display: inline-block; padding-block: 6px; }
+.recap .ans { font-size: 0.8rem; font-weight: 800; white-space: nowrap; }
+.recap .ans.gov { color: var(--gov); } .recap .ans.not { color: var(--not); } .recap .ans.hard { color: var(--hard); }
+.mark-ok { color: var(--gov); font-weight: 800; } .mark-no { color: var(--not); font-weight: 800; }
+.shot { margin: 0; display: grid; gap: 6px; }
+.frame { border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; background: var(--bg); position: relative; }
+.frame .bar { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-bottom: 1px solid var(--rule); font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); min-width: 0; }
+.frame .bar i { width: 8px; height: 8px; border-radius: 50%; background: var(--rule); flex: none; }
+.frame .bar span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-left: 4px; }
+.frame img { display: block; width: 100%; height: auto; aspect-ratio: 1280 / 900; object-fit: cover; object-position: top; background: var(--paper); }
+.frame.blur img { filter: blur(14px); }
+.frame .unblur { position: absolute; top: 40%; left: 50%; transform: translateX(-50%); width: max-content; max-width: calc(100% - 24px); min-height: 44px; font: inherit; font-weight: 700; background: var(--paper); color: var(--ink); border: 1px solid var(--rule); border-radius: 4px; padding: 8px 12px; cursor: pointer; }
+.shot figcaption { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+.keys { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); }
+footer { font-size: 0.85rem; color: var(--muted); max-width: 65ch; display: grid; gap: 8px; }
+footer p { margin: 0; }
+@media (max-width: 520px) {
+  .brandbar img { width: 150px; }
+  .brandbar a.ia img { width: 32px; height: 32px; }
+  .brandbar .tag { display: none; }
+  .stamp { top: 54px; right: 12px; }
+}
+
+/* Laptops: wide but short. Put the screenshot beside the case so the answers and the
+   explanation fit on one screen (a MacBook Air shows about 1470 x 830 in Chrome),
+   and let the stamp land on the screenshot instead of over the web address. */
+@media (min-width: 960px) {
+  .brandbar .in, .wrap { max-width: 1120px; }
+  .file:not(.case) { max-width: 760px; width: 100%; }
+  .file.case {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    grid-template-areas: "shot meta" "shot addr" "shot title" "shot clue" "shot choices" "shot verdict";
+    grid-template-rows: auto auto auto auto auto 1fr;
+    column-gap: 32px; row-gap: 14px; align-items: start;
+  }
+  .file.case > .meta { grid-area: meta; }
+  .file.case > .addr-f { grid-area: addr; }
+  .file.case > .shot { grid-area: shot; }
+  .file.case > .title-f { grid-area: title; }
+  .file.case > .clue-f { grid-area: clue; }
+  .file.case > .choices { grid-area: choices; }
+  .file.case > .verdict { grid-area: verdict; }
+  .file.case > .stamp { grid-area: shot; position: relative; top: auto; right: auto; z-index: 2;
+    align-self: start; justify-self: end; margin: 40% 30px 0 0; }   /* % of the column width: on the picture */
+  .file.case .addr { font-size: clamp(1.2rem, 2.1vw, 1.75rem); }
+}
+@media (min-width: 960px) and (max-height: 920px) {
+  .brandbar .in { padding-block: 6px; }
+  .brandbar img { width: 200px; }
+  .brandbar .tag { font-size: 1rem; max-width: none; white-space: nowrap; }
+  .wrap { padding-block: 14px 32px; gap: 14px; }
+  main { gap: 14px; }
+  h1 { font-size: 2.3rem; }
+  .file { padding: 22px 26px; }
+  .theme button { min-height: 38px; }
+}
+</style>
+
+</head>
+<body>
+<header class="brandbar">
+  <div class="in">
+    <div class="logos">
+      <a class="ia" href="https://archive.org/"><img src="img/internet-archive.png" alt="Internet Archive" width="195" height="194"></a>
+      <a class="logo" href="https://archive.org/details/democracys-library"><img src="brand/dl-logo-horizontal.png" alt="Democracy’s Library" width="1141" height="269"></a>
+    </div>
+    <nav aria-label="Site">
+      <span class="tag">Government information, freely accessible for all</span>
+      <a href="about.html">About</a>
+    </nav>
+  </div>
+</header>
+<div class="wrap">
+  <main>
+  <div class="title">
+    <h1>Government websites… or not?</h1>
+    <div class="title-tools">
+      <div class="theme" role="group" aria-label="Background">
+        <button type="button" data-theme-pick="light" aria-pressed="false">Light</button>
+        <button type="button" data-theme-pick="dark" aria-pressed="false">Dark</button>
+      </div>
+    </div>
+  </div>
+  <p class="lede">Is it run by a government, or not? Guess for ten websites at a time, drawn from the Internet Archive’s list of US and Canadian government websites and shown as the <a href="https://web.archive.org/">Wayback Machine</a> saved them.</p>
+  <div id="app"></div>
+  </main>
+  <footer>
+    <p>Every site here came from the October 2026 review of the Internet Archive’s government-websites list, where 6,843 addresses
+    turned out not to be government. Links open the site’s history in the Wayback Machine.</p>
+    <p>A game from <a href="https://archive.org/details/democracys-library">Democracy’s Library</a>, the
+    <a href="https://archive.org/">Internet Archive</a>’s free collection of government information from local, regional and national governments.</p>
+    <p>Meets <a href="https://www.w3.org/WAI/WCAG21/Understanding/character-key-shortcuts.html">WCAG 2.1 success criterion 2.1.4, Character Key Shortcuts</a>:
+    the G, N and C answer keys can be switched off on the start and results screens.</p>
+    <p>An experiment from Democracy’s Library at the Internet Archive; not an official government publication.</p>
+    <p>Feedback? <a href="mailto:info@archive.org?subject=Democracy%27s%20Library%20Explorer">Email us</a></p>
+    <!-- last-updated --><p>Last updated <time datetime="2026-11-19T08:19-05:00">November 19, 2026, 8:19 AM EST</time></p><!-- /last-updated -->
+  <!-- explorer-checks:note -->
+<p class="explorer-checks-note" style="font-size:clamp(0.8333rem, 0.875em, 1rem);margin:1em 0 0">
+  Meets WCAG 2.2 Level AA accessibility (and WCAG 2.1 AA and 2.0 AA), checked
+  <time datetime="2026-11-18">November 18, 2026</time> by automated tests and manual review.
+</p>
+<!-- /explorer-checks:note -->
+</footer>
+</div>
+
+<script src="sites.js"></script>
+<script>
+const SRC = window.SOURCES;
+const SITES = window.SITES;
+const TS = window.SHOTS;
+const LABEL = { gov: 'Government', not: 'Not government', hard: 'It’s complicated' };
+const STAMP = { gov: 'GOVERNMENT', not: 'NOT GOVERNMENT', hard: 'IT’S COMPLICATED' };
+const MIX = { gov: 5, not: 3, hard: 2 };
+const app = document.getElementById('app');
+let S = null;
+
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+// Cards this browser has already been dealt, so the next round prefers new ones.
+// Per-viewer convenience only: if storage is blocked, rounds are simply random.
+const SEEN_KEY = 'gwon-seen';
+function loadSeen() { try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); } catch (e) { return new Set(); } }
+function saveSeen(seen) { try { localStorage.setItem(SEEN_KEY, JSON.stringify([...seen])); } catch (e) {} }
+function newRound() {
+  const seen = loadSeen();
+  const pick = [];
+  for (const [k, n] of Object.entries(MIX)) {
+    const all = SITES.filter(s => s.a === k);
+    let chosen = shuffle(all.filter(s => !seen.has(s.h))).slice(0, n);
+    if (chosen.length < n) {
+      // This answer type is used up: start its cycle again, and top up from the rest.
+      all.forEach(s => seen.delete(s.h));
+      chosen = chosen.concat(shuffle(all.filter(s => !chosen.includes(s))).slice(0, n - chosen.length));
+    }
+    pick.push(...chosen);
+  }
+  // Every round deals at least one Canadian card and at least one tribal card. When one
+  // is missing, swap one in for a card with the same answer, keeping the 5/3/2 mix, and
+  // never swap out a card that another rule needs.
+  const MUST = [s => s.c === 'CA', s => s.tribe];
+  for (const rule of MUST) {
+    if (pick.some(rule)) continue;
+    const pool = shuffle(SITES.filter(s => rule(s) && !pick.includes(s)));
+    for (const card of [...pool.filter(s => !seen.has(s.h)), ...pool.filter(s => seen.has(s.h))]) {
+      const out = shuffle(pick.filter(s => s.a === card.a && !MUST.some(r => r(s))))[0];
+      if (out) { pick[pick.indexOf(out)] = card; break; }
+    }
+  }
+  pick.forEach(s => seen.add(s.h));
+  saveSeen(seen);
+  return { screen: 'play', round: shuffle(pick).map(s => s.h), i: 0, answers: [], clues: [], revealed: false };
+}
+function site(h) { return SITES.find(s => s.h === h); }
+function points(st) { return st.answers.reduce((p, a, k) => p + (a === site(st.round[k]).a ? (st.clues[k] ? 0.5 : 1) : 0), 0); }
+function esc(s) { return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function addrHTML(h) { const p = h.split('.'); const tld = p.pop(); return esc(p.join('.')) + '<span>.' + esc(tld) + '</span>'; }
+function fmt(ts) { if (!ts) return ''; const d = new Date(Date.UTC(+ts.slice(0,4), +ts.slice(4,6)-1, +ts.slice(6,8))); return 'on ' + d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }); }
+function wb(h) { return 'https://web.archive.org/web/*/' + h; }
+function shot(h) { return 'shots/' + encodeURIComponent(h) + '.jpg'; }
+
+// Letter-key answers (G, N, C) can be switched off: single-key shortcuts get in the
+// way of speech input and some screen readers (WCAG 2.1.4). Remembered per browser.
+const KEYS_KEY = 'gwon-keys';
+let keysOn = true;
+try { keysOn = localStorage.getItem(KEYS_KEY) !== 'off'; } catch (e) {}
+function setKeys(on) {
+  keysOn = on;
+  document.documentElement.classList.toggle('nokeys', !on);
+  try { localStorage.setItem(KEYS_KEY, on ? 'on' : 'off'); } catch (e) {}
+}
+setKeys(keysOn);
+function keysOptHTML() {
+  return `<label class="opt keys-opt"><input type="checkbox" id="keys" ${keysOn ? 'checked' : ''}> Answer with the G, N and C keys</label>`;
+}
+function wireKeysOpt() { const k = document.getElementById('keys'); if (k) k.onchange = () => setKeys(k.checked); }
+// Light or dark background. Until the player picks, the page follows the device setting.
+const THEME_KEY = 'gwon-theme';
+const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+function currentTheme() { return document.documentElement.dataset.theme || (darkQuery.matches ? 'dark' : 'light'); }
+function showTheme() {
+  document.querySelectorAll('[data-theme-pick]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.themePick === currentTheme())));
+}
+document.querySelectorAll('[data-theme-pick]').forEach(b => b.onclick = () => {
+  document.documentElement.dataset.theme = b.dataset.themePick;
+  try { localStorage.setItem(THEME_KEY, b.dataset.themePick); } catch (e) {}
+  showTheme();
+});
+darkQuery.addEventListener?.('change', showTheme);
+showTheme();
+const NEWTAB = '<span class="sr-only"> (opens in a new tab)</span>';
+const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function renderIntro() {
+  document.title = 'Government websites… or not?';
+  app.innerHTML = `
+    <section class="file intro" aria-labelledby="intro-h">
+      <div class="meta"><h2 id="intro-h">Case files · 10 per round</h2><span>${SITES.length} sites in the pool</span></div>
+      <p style="font-size:1.15rem">Each card shows a web address and the title of its archived home page. Decide what it is.</p>
+      <div class="mix">
+        <div class="g">Some are <b>government websites</b></div>
+        <div class="n">Some are <b>not</b></div>
+        <div class="h">And some are <b>hard to call!</b></div>
+      </div>
+      <p>A correct answer scores 1 point. Ask for the clue and it scores ½. For the hard ones, the right answer is <b>It’s complicated</b>.</p>
+      ${keysOptHTML()}
+      <div class="row"><span class="keys keys-hint">Enter for the next case</span>
+        <button class="next" id="start">Start round</button></div>
+    </section>`;
+  wireKeysOpt();
+  document.getElementById('start').onclick = () => { S = newRound(); render('top'); };
+}
+
+function progressHTML() {
+  // Decorative: the same information is in "Case n of 10" and, at the end, the recap list.
+  return '<div class="progress" aria-hidden="true">' + S.round.map((h, k) => {
+    if (k < S.answers.length) return `<i class="${S.answers[k] === site(h).a ? 'done-' + site(h).a : 'miss'}"></i>`;
+    return `<i class="${k === S.i ? 'now' : ''}"></i>`;
+  }).join('') + '</div>';
+}
+
+function renderCard() {
+  const s = site(S.round[S.i]);
+  const answered = S.revealed;
+  const mine = S.answers[S.i];
+  const right = mine === s.a;
+  const blurred = s.blur && !S.unblur?.[S.i];
+  document.title = `Case ${S.i + 1} of 10 · Government websites… or not?`;
+  app.innerHTML = `
+    <section class="file case" aria-labelledby="case-h">
+      <div class="meta"><h2 id="case-h" tabindex="-1">Case <b>${S.i + 1}</b> of 10 · Score <b>${points(S)}</b></h2>${progressHTML()}</div>
+      ${answered ? `<div class="stamp anim ${s.a}" aria-hidden="true">${STAMP[s.a]}</div>` : ''}
+      <div class="field addr-f"><span class="label">Web address${s.c === 'CA' ? ' <span class="ca">Canada</span>' : ''}</span><div class="addr">${addrHTML(s.h)}</div></div>
+      ${TS[s.h] ? `<figure class="shot">
+        <div class="frame${blurred ? ' blur' : ''}" id="frame" tabindex="-1">
+          <div class="bar" aria-hidden="true"><i></i><i></i><i></i><span>web.archive.org › ${esc(s.h)}</span></div>
+          <img src="${shot(s.h)}" alt="${blurred ? 'Blurred screenshot of the' : 'Screenshot of the'} archived home page of ${esc(s.h)}" onerror="this.closest('figure').hidden=true">
+          ${blurred ? '<button class="unblur" id="unblur">Show page (gambling spam)</button>' : ''}
+        </div>
+        <figcaption>Captured by the Wayback Machine ${fmt(TS[s.h])}</figcaption>
+      </figure>` : ''}
+      <div class="field title-f"><span class="label">Title of the archived home page</span><div class="title-val">${esc(s.t)}</div></div>
+      ${S.clues[S.i] || answered
+        ? `<div class="field clue-f" id="clue-text" tabindex="-1"><span class="label">How it got on our list</span><div>From ${SRC[s.src]}.</div></div>`
+        : `<button class="clue-btn clue-f" id="clue">Show how it got on our list (answer scores ½)</button>`}
+      <div class="choices" role="group" aria-label="Your answer">
+        ${['gov','not','hard'].map(k => { const key = k === 'gov' ? 'G' : k === 'not' ? 'N' : 'C';
+          return `<button class="choice ${k}${mine === k ? ' picked' : ''}" data-k="${k}" ${answered ? 'disabled' : ''} ${keysOn ? `aria-keyshortcuts="${key}"` : ''}>${LABEL[k]}${mine === k ? '<span class="sr-only"> (your answer)</span>' : ''}<small aria-hidden="true">${key}</small></button>`; }).join('')}
+      </div>
+      ${answered ? `
+      <div class="verdict" id="verdict">
+        <h3 id="verdict-h" tabindex="-1" class="${right ? 'right' : 'wrong'}">${right ? 'Correct.' : 'Not quite.'} It’s ${s.a === 'hard' ? 'complicated' : LABEL[s.a].toLowerCase()}.</h3>
+        <p>${esc(s.x)}</p>
+        <div class="row"><a href="${wb(s.h)}" target="_blank" rel="noopener">See ${esc(s.h)} in the Wayback Machine${NEWTAB}</a>
+          <button class="next" id="next">${S.i === 9 ? 'See results' : 'Next case'}</button></div>
+      </div>` : ''}
+    </section>`;
+  app.querySelectorAll('.choice').forEach(b => b.onclick = () => answer(b.dataset.k));
+  const c = document.getElementById('clue'); if (c) c.onclick = () => { S.clues[S.i] = true; render('clue'); };
+  const u = document.getElementById('unblur'); if (u) u.onclick = () => { (S.unblur ||= {})[S.i] = true; render('frame'); };
+  const n = document.getElementById('next'); if (n) n.onclick = next;
+}
+
+function answer(k) { if (S.revealed) return; S.answers[S.i] = k; S.revealed = true; render('verdict'); }
+function next() { if (!S.revealed) return; S.revealed = false; S.i++; if (S.i >= 10) S.screen = 'done'; render('top'); }
+
+function renderDone() {
+  const p = points(S);
+  const verdict = p >= 9 ? 'Records-office material.' : p >= 7 ? 'A sharp eye.' : p >= 5 ? 'Harder than it looks, right?' : 'That is why we check by hand.';
+  document.title = `Round complete: ${p} / 10 · Government websites… or not?`;
+  app.innerHTML = `
+    <section class="file" aria-labelledby="done-h">
+      <div class="meta"><h2 id="done-h" tabindex="-1">Round complete</h2>${progressHTML()}</div>
+      <div><div class="score">${p} / 10</div><p style="margin:6px 0 0;font-weight:600">${verdict}</p></div>
+      <ul class="recap">
+        ${S.round.map((h, k) => { const s = site(h); const ok = S.answers[k] === s.a;
+          return `<li><span class="${ok ? 'mark-ok' : 'mark-no'}"><span aria-hidden="true">${ok ? '✓' : '✗'}</span><span class="sr-only">${ok ? 'Right:' : 'Missed:'}</span></span>
+            <span class="host"><a href="${wb(h)}" target="_blank" rel="noopener">${esc(h)}${NEWTAB}</a></span>
+            <span class="ans ${s.a}">${LABEL[s.a]}</span></li>`; }).join('')}
+      </ul>
+      ${keysOptHTML()}
+      <div class="row"><span class="keys">The next round deals cards you haven’t seen yet.</span>
+        <button class="next" id="again">Play another round</button></div>
+    </section>`;
+  wireKeysOpt();
+  document.getElementById('again').onclick = () => { S = newRound(); render('top'); };
+}
+
+// focus says what just happened, so focus and scroll can follow it:
+//   'top'     a new case or screen: back to the top of the page (on a phone the
+//             Next button is far down), focus its heading so screen readers start there
+//   'verdict' an answer: bring the explanation into view and focus its heading
+//   'clue', 'frame'  the button that was pressed is gone: focus what replaced it
+function render(focus) {
+  if (!S) renderIntro(); else if (S.screen === 'done') renderDone(); else renderCard();
+  const behavior = reduceMotion() ? 'auto' : 'smooth';
+  if (focus === 'top') {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    app.querySelector('h2')?.focus({ preventScroll: true });
+  } else if (focus === 'verdict') {
+    const v = document.getElementById('verdict');
+    document.getElementById('verdict-h').focus({ preventScroll: true });
+    if (v.getBoundingClientRect().bottom > window.innerHeight) v.scrollIntoView({ block: 'start', behavior });
+  } else if (focus === 'clue') {
+    document.getElementById('clue-text')?.focus();
+  } else if (focus === 'frame') {
+    document.getElementById('frame')?.focus();
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (!S || S.screen !== 'play' || e.metaKey || e.ctrlKey || e.altKey) return;
+  // Leave keys alone when they belong to a control: Enter on the Wayback link must open it.
+  if (e.target.closest?.('input, select, textarea, [contenteditable]')) return;
+  const k = e.key.toLowerCase();
+  if (k === 'enter' && e.target.closest?.('a, button')) return;
+  if (keysOn && !S.revealed && (k === 'g' || k === 'n' || k === 'c')) { e.preventDefault(); answer(k === 'g' ? 'gov' : k === 'n' ? 'not' : 'hard'); }
+  else if (S.revealed && k === 'enter') { e.preventDefault(); next(); }
+});
+
+function start(data) { S = data && data.S ? data.S : null; render(); }
+window.claude?.hot?.snapshot?.(() => ({ S }));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>About: Government websites… or not?</title>
+<meta name="description" content="About Government websites… or not?, a guessing game from Democracy’s Library at the Internet Archive: where the sites come from, how they were chosen, and what is left out.">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script>
+try { const t = localStorage.getItem('gwon-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<style>
+/* The game's colors and type, so About reads as the same site. */
+:root {
+  --bg: #e9edf2; --paper: #fbfcfd; --ink: #14233a; --mint: #e3fed5; --brand-ink: #000;
+  --muted: #5b6b80; --rule: #c9d2dd; --accent: #2456a6; color-scheme: light;
+  --font-display: "Teko", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Public Sans", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #0f1724; --paper: #172234; --ink: #e6ecf4; --muted: #9aa8bb; --rule: #2c3a50; --accent: #8fb4ff; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #0f1724; --paper: #172234; --ink: #e6ecf4; --muted: #9aa8bb; --rule: #2c3a50; --accent: #8fb4ff; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6; -webkit-text-size-adjust: 100%; }
+.brandbar { background: var(--mint); color: var(--brand-ink); border-bottom: 1px solid color-mix(in srgb, var(--brand-ink) 15%, transparent); padding-top: env(safe-area-inset-top); }
+.brandbar .in { max-width: 760px; margin: 0 auto; padding: 10px max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left)); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brandbar .logos { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.brandbar a.ia { display: block; flex: none; background: #14233a; border-radius: 6px; padding: 6px; }
+.brandbar a.ia img { display: block; width: 40px; height: 40px; }
+.brandbar a.logo { display: block; min-width: 0; border-radius: 3px; }
+.brandbar a.logo img { display: block; width: 240px; max-width: 100%; height: auto; }
+.brandbar nav a { color: var(--brand-ink); font-weight: 700; display: inline-block; padding-block: 10px; }
+.brandbar a:focus-visible { outline: 3px solid var(--brand-ink); outline-offset: 2px; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 28px max(16px, env(safe-area-inset-right)) max(48px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(2.3rem, 7vw, 3.2rem); line-height: 0.95; text-transform: uppercase; margin: 0 0 16px; }
+h2 { font-size: 1.25rem; font-weight: 800; margin: 32px 0 8px; }
+p, ul { margin: 0 0 12px; max-width: 65ch; }
+li { margin-bottom: 6px; }
+a { color: var(--accent); }
+a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--rule); font-size: 0.85rem; color: var(--muted); }
+footer p { margin: 0 0 8px; }
+@media (max-width: 520px) {
+  .brandbar a.logo img { width: 150px; }
+  .brandbar a.ia img { width: 32px; height: 32px; }
+}
+</style>
+</head>
+<body>
+<header class="brandbar">
+  <div class="in">
+    <div class="logos">
+      <a class="ia" href="https://archive.org/"><img src="img/internet-archive.png" alt="Internet Archive" width="195" height="194"></a>
+      <a class="logo" href="https://archive.org/details/democracys-library"><img src="brand/dl-logo-horizontal.png" alt="Democracy’s Library" width="1141" height="269"></a>
+    </div>
+    <nav aria-label="Site"><a href="./">Play the game</a></nav>
+  </div>
+</header>
+<div class="wrap">
+<main>
+  <h1>About Government websites… or not?</h1>
+  <p>A guessing game about what counts as a government website. Each round deals ten websites as the <a href="https://web.archive.org/">Wayback Machine</a> saved them. For each one, you decide whether it is government, not government, or complicated, and then read why.</p>
+
+  <h2>The project</h2>
+  <p>The Internet Archive has been building a list of US and Canadian government websites, ranked by how much of each one the Wayback Machine has saved. In October 2026 the list was reviewed by hand for a kiosk display, and 6,843 addresses turned out not to be government: law firms, newspapers, chambers of commerce, and town addresses that had lapsed and been bought by someone else. Some real governments looked fake, too. The Town of Accident, Maryland was nearly removed because its website looked like an accident lawyer’s.</p>
+  <p>The game turns those decisions into a test of knowledge and a way to build information literacy skills. A web address alone can’t tell you who runs a site, and what counts as a government agency is genuinely complex: it depends on the jurisdiction and on who pays for it.</p>
+
+  <h2>Where the websites come from</h2>
+  <p>Every website in the game is on the Internet Archive’s list of government websites, and most were decided in the October 2026 review. The list itself was gathered from many sources, including the .gov domain registry, the US Census of Governments, state and provincial directories, Wikidata, OpenStreetMap, and <a href="https://archive-it.org/">Archive-It</a> collections built by state libraries and archives. Each card’s clue says which source put that website on the list. As of November 18, 2026 the game has 48 websites, with screenshots the Wayback Machine saved between June 2017 and October 2026.</p>
+  <p>The screenshots and links come from the <a href="https://web.archive.org/">Wayback Machine</a>, part of the <a href="https://archive.org/">Internet Archive</a>. This is a project of <a href="https://archive.org/details/democracys-library">Democracy’s Library</a>, the Internet Archive’s free collection of government information.</p>
+
+  <h2>What is left out</h2>
+  <p>The game is a hand-picked sample, not a full directory, and it covers only the United States and Canada. The answers and explanations are the judgment of the people who built it, written from the archived pages. If you think we got one wrong, please tell us.</p>
+
+  <h2>How it was built</h2>
+  <p>Written in HTML, CSS and JavaScript; it runs entirely in your browser. Python found the latest good Wayback Machine capture of each website and took its screenshot. Merrilee Proffitt chose the websites and wrote the explanations, Robin Fay designed the Democracy’s Library look and made the game work on phones and with assistive technology, and Claude, an AI assistant, wrote much of the code under their direction.</p>
+
+  <h2>Accessibility</h2>
+  <p>Meets WCAG 2.2 Level AA accessibility (and WCAG 2.1 AA and 2.0 AA), checked November 18, 2026 by automated tests and manual review.</p>
+  <p>The game works with a keyboard and a screen reader: each new case moves focus to its heading, and every answer has a button. Players can turn off the G, N and C answer keys (<a href="https://www.w3.org/WAI/WCAG22/Understanding/character-key-shortcuts.html">WCAG success criterion 2.1.4</a>) and choose a light or dark background.</p>
+</main>
+<footer>
+  <p>An experiment from Democracy’s Library at the Internet Archive; not an official government publication.</p>
+  <p>Feedback? <a href="mailto:info@archive.org?subject=Democracy%27s%20Library%20Explorer">Email us</a></p>
+  <!-- last-updated --><p>Last updated <time datetime="2026-11-19T08:19-05:00">November 19, 2026, 8:19 AM EST</time></p><!-- /last-updated -->
+<!-- explorer-checks:note -->
+<p class="explorer-checks-note" style="font-size:clamp(0.8333rem, 0.875em, 1rem);margin:1em 0 0">
+  Meets WCAG 2.2 Level AA accessibility (and WCAG 2.1 AA and 2.0 AA), checked
+  <time datetime="2026-11-18">November 18, 2026</time> by automated tests and manual review.
+</p>
+<!-- /explorer-checks:note -->
+</footer>
+</div>
+</body>
+</html>
